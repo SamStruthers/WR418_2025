@@ -1,0 +1,147 @@
+---
+title: "Assignment 1: Temperature and DO"
+author: "Sam Struthers & Carolina Barbosa - adapted from Nick Gubbins"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dataRetrieval)
+library(lubridate)
+library(tidyverse)
+```
+
+# Ecological Context
+
+## Temperature as a master control
+
+Available energy in a system is the master control on which, and at what
+rate, chemical reactions take place. Temperature is the most common, and
+most easily accessible, measurement of energy in a system. While other
+forms of energy ( such as turbulence) are critical for understanding
+aquatic systems, temperature can be easily and cheaply measured without
+effecting the system itself. For this week's assignment, we will be
+getting more familiar with R by downloading and analyzing temperature
+data from the USGS.
+
+## Power generation and water temperature
+
+Rivers are often used as a water source for the production of steam in
+power generation. Generating stations draw in water from upstream, use
+it to create steam, use that steam to spin turbines, then (mostly) cool
+the steam, and re-release it downstream. You can clearly see the effect
+of this on the White River in downtown Indianapolis, IN. Station
+03353000 is located just upstream of a major generating plant. Station
+03353611 is just below it. The gauges are only \~2 miles apart. Let's
+load in a few months of data from both and see how they differ.
+
+```{r}
+
+site_data <- readNWISuv(siteNumbers = c( '03353000', "03353611"),
+                   parameterCd = '00010',
+                   startDate = '2024-10-01',
+                   endDate =  '2025-01-01')
+
+ggplot(site_data, aes(x = dateTime, y = X_00010_00000, color = site_no))+
+  geom_line()+
+  labs(x = 'Date', y = 'Temperature (degrees C)', color = 'Site')
+
+```
+
+You can see the effect of the generating station most clearly as
+temperatures drop for the winter. Water is usually returned at \~20
+degrees C, giving the downstream site a higher average temperature.
+
+## Dissolved oxygen and temperature
+
+Dissolved oxygen is a key indicator of aquatic health. It is produced by
+photosynthesizing microbes and macrophytes. Heterotrophs, like fish and
+many kinds of bacteria, use dissolved oxygen in respiration. Healthy
+freshwater systems tend to have dissolved oxygen levels above 6 mg/L
+(usually around 80% saturation or higher). When dissolved oxygen levels
+get too low (below 6 mg/L) fish cannot spawn, as fish eggs rely on
+passive diffusion of dissolved oxygen to survive. Below 5 mg/L DO, you
+can see dramatic [fish
+kills](https://apnews.com/article/837ec91d3a1c4f86b1258be93cd865e8).
+These kills represent a huge disruption to the river's food chain and a
+massive influx of organic matter, often leading to spiraling water
+quality issues.
+
+# Assignment
+
+Read in **mean daily** discharge (code '00060'), DO (code '00300'), and
+temperature (code '00010') data from the South Platte River at
+Englewood, CO ('06711565') for the 2023 water year
+
+Let's first look at the readNWISdv function to see what it does.
+
+```{r}
+#?readNWISdv
+```
+
+Now we can will in the function inputs to get the data we want
+
+```{r}
+data <- readNWISdv(siteNumbers = '06711565',
+                   parameterCd = c('00060', '00300', '00010'),
+                   startDate = '2023-10-01',
+                   endDate =  '2024-9-30')
+```
+
+## Q1 (10pts):
+
+Look at the structure of the data in any way you choose.
+
+## Q2 (10 pts):
+
+Rename your columns to something sensible, omit rows without complete
+observations (NAs), and reduce your data frame to only include the date
+and your data of interest.
+
+## Q3 (10pts):
+
+Plot a time series of all three parameters in the same graph.
+
+## Q4 (10pts):
+
+This time series graph is not very useful to us. Why not? Give two
+examples of design choices you could make to improve its usefulness.
+
+## Q5 (20pts):
+
+Implement both of your proposed changes.
+
+## Q6 (10pts):
+
+Scatterplots are a great way to compare correlations. Create two
+scatterplots. One of DO vs Q, the other of DO vs temperature.
+
+## Q7 (10pts):
+
+Use the 'cor()' function to test which two variables are the most
+closely related (look at the 'help' window for documentation). Which
+relationship is it? Why do you think that is? Report your answers in
+complete sentences.
+
+## Q8 (30 pts):
+
+Imagine the city of Englewood is exploring building a coal-fired power
+plant using the South Platte as its water source and you have been hired
+on as a consultant. **Write a paragraph** brief for the city. Given that
+the benefits to the city are concrete, what issues would you raise? What
+effects do you think the plant would have on water temperatures and
+water quality? What data/assurances would you need to see before
+thinking the project should go ahead?
+
+## Bonus Q ([**Ungraded**]{.underline}):
+
+Pull in daily discharge (code '00060') data for the two USGS sites on
+the Cache la Poudre River in Fort Collins, CO ('06752260' and
+'06752280') for the 2023 water year (2023-10-01 - 2024-09-30). Plot the
+data in a way that shows the difference between the two sites. What do
+you think is causing the difference?
