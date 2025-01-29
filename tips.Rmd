@@ -1,0 +1,110 @@
+---
+title: "R Tips"
+author: "Sam Struthers"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+  markdown: 
+    wrap: 72
+---
+
+# Set up
+
+We will typically packages to accomplish alot of the tasks in this
+class. To use the package, you need to first install it (only once) and
+then library it (everytime you start a new R session).
+
+```{r setup, message = FALSE}
+#install.packages("dataRetrieval")
+#install.packages("lubridate")
+#install.packages("tidyverse")
+
+library(dataRetrieval)
+library(lubridate)
+library(tidyverse)
+```
+
+# Packages
+
+Tidyverse: Tidyverse is an collection of R packages that work together
+to make data transformation and handling easier. Please use them!
+Lubridate: Lubridate is a package that makes working with dates and
+times easier. It is part of the Tidyverse. GGplot2: GGplot2 is a package
+that makes it easier to create plots in R. It is part of the Tidyverse.
+Arrow: Arrow is a package to quickly read in various forms of data
+DataRetrieval: DataRetrieval is a package that makes it easier to
+retrieve data from the USGS NWIS database.
+
+# Quick Tips
+
+To create a new chunk (like the one below), you can use the keyboard
+shortcut Ctrl + Alt + I (Cmd + Option + I on a Mac).
+
+```{r}
+# This is a code chunk
+```
+
+To run a line of code, you can use the keyboard shortcut Ctrl + Enter
+(Cmd + Enter on a Mac).
+
+```{r}
+#To comment out code, use the # symbol in code chunks.
+#This will prevent the code from running.
+
+#To comment out multiple lines of code, highlight the lines and use the 
+#keyboard shortcut Ctrl + Shift + C (Cmd + Shift + C on a Mac).
+print("I love commenting my code!!") # You can put comments after a code like this
+
+print("I love commenting my code!!") # Ex: This is how I can print text in R
+
+```
+
+Parentheses/curly brackets can get a bit confusing in long functions.
+Engage rainbow parentheses by going to Tools -\> Global Options -\> Code
+-\> Display -\> Show rainbow parentheses.
+
+```{r}
+for (i in 1:10) {
+  if (i %% 2 == 0) {
+    print(i)
+  }
+}
+```
+
+You can also change the color of your R Console by going to Tools -\>
+Global Options -\> Appearance -\> Editor theme. (Personally I like
+Merbivore Soft)
+
+# Reproducible Examples
+
+Helpful Example
+- Shows packages used
+- Shows/loads the dataset
+- Then shows the code you are trying to troubleshoot
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Show/Load dataset
+df <- tibble::tibble(
+  category = c("A", "B", "C", "D"),
+  value = c(10, 15, 7, 20)
+)
+
+# Attempt to plot the data
+ggplot(df, aes(x = category, y = value)) +
+  geom_col(fill = "blue") +
+  labs(title = "Category vs Value")
+
+```
+
+Not Helpful Example
+
+```{r}
+ggplot(my_data, aes(x = category, y = value)) +
+  geom_col()
+
+```
+
