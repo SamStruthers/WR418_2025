@@ -1,0 +1,100 @@
+---
+title: "Tidy Tuesday"
+author: "Sam Struthers"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Set up
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+##install.packages("tidytuesdayR")
+
+today <- Sys.Date()+ days(1)
+
+tuesdata <- tidytuesdayR::tt_load(today)
+
+names(tuesdata)
+
+```
+
+# Example for 2/4/24
+
+## Make a plot of IMDB ratings over time
+
+```{r}
+episodes <- tuesdata$simpsons_episodes
+
+ggplot(episodes, aes(x = original_air_date, y = imdb_rating)) +
+  geom_point() +
+  #geom_smooth() +
+  labs(title = "IMDB Ratings of Simpsons Episodes Over Time",
+       x = "Air Date",
+       y = "IMDB Rating (0-10)")
+
+```
+
+## Do more people vote for better episodes?
+
+Lets see if there is a correlation with the number of votes and IMDB scores
+
+```{r}
+
+ggplot(episodes, aes(x = imdb_votes, y = imdb_rating)) +
+  geom_point() +
+  #geom_smooth() +
+  labs(title = "IMDB Ratings of Simpsons Episodes with number of votes",
+       x = "Number of Votes",
+       y = "IMDB Rating (0-10)")
+
+```
+
+## Are the most watched shows the highest rated?
+
+We would think that the most people would watch the best episodes, but is that true?
+
+```{r}
+ggplot(episodes, aes(x = us_viewers_in_millions , y =  imdb_rating)) +
+  geom_point() +
+  #geom_smooth() +
+  labs(title = "IMDB Ratings of Simpsons Episodes with number of viewers",
+       x = "Number of US viewers (Millions)",
+       y = "IMDB Rating (0-10)")
+
+summary(lm(episodes$imdb_rating ~ episodes$us_viewers_in_millions))
+
+
+```
+
+## Maybe the most watched episodes are the season premiere or season finale?
+
+```{r}
+
+episodes <- episodes%>%
+  group_by(season) %>% #group by the season
+  mutate(order = ifelse(number_in_season == 1, "premiere", # the premiere is always the first
+                        ifelse(max(number_in_season) == number_in_season, "finale", # the finale is the last of the season
+                                "normal")))%>% # all other episodes
+  ungroup()
+#lets rearrange these so that our plot looks nice
+episodes$order = factor(episodes$order, levels = c("premiere",  "normal", "finale"))
+
+ggplot(episodes, aes(x = order,  y = us_viewers_in_millions, color = order)) +
+  geom_boxplot() +
+  labs(title = "Number of US viewers for Simpsons Episodes by Episode Type",
+       x = "Episode Type",
+       y = "Number of US viewers (Millions)", 
+       color = "")+
+  theme_bw()
+
+# test the difference between the finale and premiere
+t.test(us_viewers_in_millions ~ order, data = episodes%>%filter(order %in% c("premiere", "finale")))
+
+
+```
+
+
+
+
